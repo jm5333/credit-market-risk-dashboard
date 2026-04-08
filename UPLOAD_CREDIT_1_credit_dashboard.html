@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Credit & Market Risk Analytics Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#0a0f1e;color:#e2e8f0;min-height:100vh}
+.topbar{background:linear-gradient(135deg,#0f172a,#064e3b);padding:14px 28px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #134e4a}
+.topbar h1{font-size:15px;font-weight:700;color:#fff}
+.topbar span{font-size:11px;color:#94a3b8}
+.container{max-width:1280px;margin:0 auto;padding:20px 24px}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+.kpi{background:#0f172a;border:1px solid #1e293b;border-radius:10px;padding:16px 18px;position:relative;overflow:hidden}
+.kpi::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent)}
+.kpi .label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b;margin-bottom:6px}
+.kpi .value{font-size:26px;font-weight:800;color:#f1f5f9;line-height:1}
+.kpi .sub{font-size:11px;margin-top:5px;color:#64748b}
+.kpi .sub.warn{color:#f59e0b}.kpi .sub.ok{color:#22c55e}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px}
+.row4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:14px;margin-bottom:14px}
+.card{background:#0f172a;border:1px solid #1e293b;border-radius:10px;padding:18px}
+.card h3{font-size:11px;font-weight:700;color:#64748b;margin-bottom:14px;text-transform:uppercase;letter-spacing:.06em}
+.note{font-size:10px;color:#475569;font-style:italic;margin-bottom:10px;background:#1e293b;padding:6px 10px;border-radius:6px}
+table{width:100%;border-collapse:collapse;font-size:11.5px}
+th{text-align:left;padding:6px 8px;background:#1e293b;color:#64748b;font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.05em}
+td{padding:6px 8px;border-bottom:1px solid #1e293b;color:#cbd5e1}
+tr:last-child td{border:none}
+.pill{display:inline-block;border-radius:4px;font-size:10px;font-weight:700;padding:2px 7px}
+.aaa{background:#14532d;color:#86efac}.aa{background:#166534;color:#bbf7d0}
+.a{background:#1e3a5f;color:#93c5fd}.bbb_{background:#1e293b;color:#cbd5e1}
+.bb{background:#78350f;color:#fcd34d}.b_{background:#7c2d12;color:#fdba74}
+.ccc{background:#7f1d1d;color:#fca5a5}
+.insight{background:#1e293b;border-left:3px solid #0d9488;border-radius:0 8px 8px 0;padding:9px 12px;font-size:11px;color:#94a3b8;margin-top:10px;line-height:1.6}
+.footer{text-align:center;font-size:10px;color:#334155;padding:16px}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div>
+    <span style="font-size:11px;color:#6ee7b7">Risk Analytics Portfolio  |  Credit & Market Risk  |  Basel II/III Aligned</span>
+    <h1>Credit & Market Risk Analytics Dashboard</h1>
+  </div>
+  <span>5,000 synthetic loans  |  $650.8M exposure  |  Jeevan Lal Mourya</span>
+</div>
+<div class="container">
+
+  <div class="kpi-grid">
+    <div class="kpi" style="--accent:#22c55e">
+      <div class="label">Portfolio Default Rate</div>
+      <div class="value">7.28%</div>
+      <div class="sub warn">Above 5% watch threshold — BB/B tier driven</div>
+    </div>
+    <div class="kpi" style="--accent:#f59e0b">
+      <div class="label">Total Expected Loss</div>
+      <div class="value">$21.4M</div>
+      <div class="sub ok">3.28% of portfolio — within acceptable range</div>
+    </div>
+    <div class="kpi" style="--accent:#8b5cf6">
+      <div class="label">Stress Scenario Loss</div>
+      <div class="value">$97.6M</div>
+      <div class="sub">99th percentile estimate — 1-in-100 scenario</div>
+    </div>
+    <div class="kpi" style="--accent:#06b6d4">
+      <div class="label">Avg Credit Score</div>
+      <div class="value">708</div>
+      <div class="sub ok">Near-prime portfolio — avg DTI 1.56x</div>
+    </div>
+  </div>
+
+  <div class="row2">
+    <div class="card">
+      <h3>Default rate vs expected loss by internal rating tier</h3>
+      <div class="note">Note: Ratings are internally derived risk tiers based on credit score, DTI, and delinquency history — not external agency ratings (S&P / Moody's).</div>
+      <canvas id="ratingChart" height="130"></canvas>
+      <div class="insight">BBB is the largest segment (1,556 loans) with a 9.4% default rate and $8.89M expected loss — 42% of total portfolio EL from one tier. Recommend tightening BBB criteria (score ≥ 700 + DTI < 2.0x).</div>
+    </div>
+    <div class="card">
+      <h3>Portfolio distribution by internal rating</h3>
+      <div class="note">Investment-grade tiers (AAA–BBB) represent 82.6% of portfolio. Speculative-grade (BB–CCC) at 17.4% — within typical bank limits of 15–20%.</div>
+      <canvas id="concChart" height="130"></canvas>
+      <div class="insight">Portfolio is well diversified across investment-grade tiers. BB/B/CCC exposure is manageable but warrants ongoing monitoring as economic conditions change.</div>
+    </div>
+  </div>
+
+  <div class="row3">
+    <div class="card">
+      <h3>Default rate by loan purpose</h3>
+      <canvas id="purposeChart" height="160"></canvas>
+      <div class="insight">Business loans show the lowest default rate (5.1%). Personal loans are highest at 8.3% — shifting origination mix toward business lending could reduce overall portfolio default rate.</div>
+    </div>
+    <div class="card">
+      <h3>Expected loss by loan purpose ($M)</h3>
+      <canvas id="elPurposeChart" height="160"></canvas>
+      <div class="insight">Despite lower default rate, Home loans carry the highest EL ($3.69M) due to larger loan sizes. Business and Debt Consolidation EL is driven more by volume than default rate.</div>
+    </div>
+    <div class="card">
+      <h3>Stress scenario loss by rating ($M)</h3>
+      <div class="note">99th percentile loss estimate per tier — not VaR in the trading sense. Represents stressed credit loss under adverse scenario.</div>
+      <canvas id="varChart" height="130"></canvas>
+      <div class="insight">A-rated and BBB-rated tiers drive the largest stress exposure ($28M and $36M) — not because they have high default rates, but because they hold the most loans.</div>
+    </div>
+  </div>
+
+  <div class="row2" style="margin-bottom:14px">
+    <div class="card">
+      <h3>ERM risk concentration — estimated portfolio exposure</h3>
+      <canvas id="ermDonut" height="140"></canvas>
+      <div class="insight" style="margin-top:8px">Market risk stress scenario ($97.6M) dominates ERM exposure due to portfolio size. Credit EL ($21.4M) is well-controlled at 3.28% of portfolio.</div>
+    </div>
+    <div class="card">
+      <h3>Credit score distribution across portfolio</h3>
+      <canvas id="scoreChart" height="140"></canvas>
+      <div class="insight" style="margin-top:8px">Score distribution is roughly bell-shaped with a peak in the 680–740 range — consistent with a near-prime consumer portfolio. Subprime (<580) loans represent a small tail.</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px">
+    <h3>Loan-level risk breakdown — internally derived rating tiers (Basel II aligned methodology)</h3>
+    <div class="note" style="margin-bottom:12px">Ratings assigned based on credit score, debt-to-income ratio, and delinquency history. Not S&P/Moody's ratings — internal segmentation for portfolio risk management purposes.</div>
+    <table>
+      <thead><tr><th>Rating</th><th>Loans</th><th>Avg Score</th><th>Avg PD</th><th>Actual Default</th><th>Exp. Loss ($M)</th><th>Stress Loss ($M)</th><th>Assessment</th></tr></thead>
+      <tbody>
+        <tr><td><span class="pill aaa">AAA</span></td><td>526</td><td>792</td><td>2.9%</td><td>3.2%</td><td>$0.49M</td><td>$5.67M</td><td style="color:#86efac;font-size:10px">Well within limits</td></tr>
+        <tr><td><span class="pill aa">AA</span></td><td>634</td><td>759</td><td>3.0%</td><td>2.8%</td><td>$1.00M</td><td>$11.16M</td><td style="color:#86efac;font-size:10px">Well within limits</td></tr>
+        <tr><td><span class="pill a">A</span></td><td>1,414</td><td>730</td><td>4.2%</td><td>3.7%</td><td>$3.41M</td><td>$28.33M</td><td style="color:#93c5fd;font-size:10px">Acceptable</td></tr>
+        <tr><td><span class="pill bbb_">BBB</span></td><td>1,556</td><td>701</td><td>8.5%</td><td>9.4%</td><td>$8.89M</td><td>$35.56M</td><td style="color:#fcd34d;font-size:10px">Monitor closely</td></tr>
+        <tr><td><span class="pill bb">BB</span></td><td>523</td><td>621</td><td>11.7%</td><td>11.5%</td><td>$3.74M</td><td>$10.33M</td><td style="color:#fdba74;font-size:10px">Elevated — watch</td></tr>
+        <tr><td><span class="pill b_">B</span></td><td>278</td><td>577</td><td>18.5%</td><td>19.4%</td><td>$2.93M</td><td>$5.27M</td><td style="color:#fca5a5;font-size:10px">High — review</td></tr>
+        <tr><td><span class="pill ccc">CCC</span></td><td>69</td><td>517</td><td>22.9%</td><td>21.7%</td><td>$0.91M</td><td>$1.30M</td><td style="color:#fca5a5;font-size:10px">Critical — flag</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+<div class="footer">Credit & Market Risk Analytics  ·  SQL + Python + Chart.js  ·  Basel II/III Methodology  ·  Risk Analytics Portfolio — Jeevan Lal Mourya  ·  github.com/jm5333</div>
+
+<script>
+const ratings=['AAA','AA','A','BBB','BB','B','CCC'];
+const defRates=[3.2,2.8,3.7,9.4,11.5,19.4,21.7];
+const elVals=[0.49,1.00,3.41,8.89,3.74,2.93,0.91];
+const varVals=[5.67,11.16,28.33,35.56,10.33,5.27,1.30];
+const counts=[526,634,1414,1556,523,278,69];
+const colors=['#14532d','#166534','#1e3a5f','#334155','#78350f','#7c2d12','#7f1d1d'];
+const borders=['#22c55e','#4ade80','#3b82f6','#64748b','#f59e0b','#f97316','#ef4444'];
+
+new Chart(document.getElementById('ratingChart').getContext('2d'),{
+  type:'bar',
+  data:{labels:ratings,datasets:[
+    {label:'Default Rate %',data:defRates,backgroundColor:colors.map(c=>c+'cc'),borderRadius:3,yAxisID:'y'},
+    {label:'EL ($M)',data:elVals,type:'line',borderColor:'#f59e0b',backgroundColor:'#f59e0b22',fill:true,tension:0.4,pointRadius:3,yAxisID:'y1'}
+  ]},
+  options:{plugins:{legend:{labels:{color:'#94a3b8',font:{size:10}}}},scales:{
+    x:{grid:{display:false},ticks:{color:'#64748b',font:{size:10}}},
+    y:{grid:{color:'#1e293b'},ticks:{color:'#64748b',font:{size:10},callback:v=>v+'%'}},
+    y1:{position:'right',grid:{display:false},ticks:{color:'#f59e0b',font:{size:10},callback:v=>'$'+v+'M'}}
+  }}
+});
+
+new Chart(document.getElementById('concChart').getContext('2d'),{
+  type:'doughnut',
+  data:{labels:ratings,datasets:[{data:counts,backgroundColor:colors,borderColor:borders,borderWidth:1}]},
+  options:{cutout:'60%',plugins:{legend:{position:'right',labels:{color:'#94a3b8',font:{size:10},padding:6}}}}
+});
+
+new Chart(document.getElementById('purposeChart').getContext('2d'),{
+  type:'bar',
+  data:{labels:['Personal','Debt Consol.','Home','Auto','Education','Business'],
+        datasets:[{label:'Default Rate %',data:[8.3,7.9,7.8,7.3,7.1,5.1],backgroundColor:'#7c2d12cc',borderRadius:3}]},
+  options:{indexAxis:'y',plugins:{legend:{display:false}},
+    scales:{x:{grid:{color:'#1e293b'},ticks:{color:'#64748b',font:{size:10},callback:v=>v+'%'}},
+            y:{grid:{display:false},ticks:{color:'#64748b',font:{size:10}}}}}
+});
+
+new Chart(document.getElementById('elPurposeChart').getContext('2d'),{
+  type:'bar',
+  data:{labels:['Home','Debt Consol.','Personal','Business','Auto','Education'],
+        datasets:[{label:'Expected Loss ($M)',data:[3.69,3.79,3.66,3.56,3.44,3.23],backgroundColor:'#6d28d9cc',borderRadius:3}]},
+  options:{indexAxis:'y',plugins:{legend:{display:false}},
+    scales:{x:{grid:{color:'#1e293b'},ticks:{color:'#64748b',font:{size:10},callback:v=>'$'+v+'M'}},
+            y:{grid:{display:false},ticks:{color:'#64748b',font:{size:10}}}}}
+});
+
+new Chart(document.getElementById('varChart').getContext('2d'),{
+  type:'bar',
+  data:{labels:ratings,datasets:[{label:'Stress Loss ($M)',data:varVals,backgroundColor:'#4f46e5cc',borderRadius:3}]},
+  options:{plugins:{legend:{display:false}},
+    scales:{x:{grid:{display:false},ticks:{color:'#64748b',font:{size:10}}},
+            y:{grid:{color:'#1e293b'},ticks:{color:'#64748b',font:{size:10},callback:v=>'$'+v+'M'}}}}
+});
+
+new Chart(document.getElementById('ermDonut').getContext('2d'),{
+  type:'doughnut',
+  data:{labels:['Credit Risk (EL)','Stress Scenario Loss','Operational','Compliance'],
+        datasets:[{data:[21.4,97.6,18.5,10.2],backgroundColor:['#7f1d1d','#7c2d12','#78350f','#1e3a5f'],
+                   borderColor:['#ef4444','#f97316','#f59e0b','#3b82f6'],borderWidth:1}]},
+  options:{cutout:'60%',plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{size:10},padding:6}}}}
+});
+
+// Credit score distribution
+const scoreBuckets=['<540','540-579','580-619','620-659','660-699','700-739','740-779','780+'];
+const scoreCounts=[42,97,180,320,480,1150,1280,451];
+const scoreColors=['#7f1d1d','#7c2d12','#78350f','#854d0e','#1e3a5f','#1e40af','#166534','#14532d'];
+new Chart(document.getElementById('scoreChart').getContext('2d'),{
+  type:'bar',
+  data:{labels:scoreBuckets,datasets:[{label:'Loan Count',data:scoreCounts,backgroundColor:scoreColors,borderRadius:3}]},
+  options:{plugins:{legend:{display:false}},
+    scales:{x:{grid:{display:false},ticks:{color:'#64748b',font:{size:10}}},
+            y:{grid:{color:'#1e293b'},ticks:{color:'#64748b',font:{size:10}}}}}
+});
+</script>
+</body>
+</html>
